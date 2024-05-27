@@ -1,6 +1,7 @@
 #include "LD2450.h"
 #include "esphome/core/log.h"
-
+#include <chrono> // 包含 chrono 库
+#include <thread> // 包含 thread 库
 namespace esphome::ld2450
 {
     int allTargetCount=0;
@@ -315,6 +316,7 @@ namespace esphome::ld2450
             target_count += target->is_present();
         }
         is_occupied_ = target_count > 0;
+        std::this_thread::sleep_for(std::chrono::seconds(2));
          allTargetCount=target_count+allTargetCount;
         target_count=allTargetCount;
 
