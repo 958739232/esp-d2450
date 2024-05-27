@@ -1,7 +1,6 @@
 #include "LD2450.h"
 #include "esphome/core/log.h"
-#include <chrono> // 包含 chrono 库
-#include <thread> // 包含 thread 库
+
 namespace esphome::ld2450
 {
     int allTargetCount=0;
@@ -276,12 +275,7 @@ namespace esphome::ld2450
             }
         }
     }
-void delayed_update(int target_count) 
-{
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-     allTargetCount=target_count+allTargetCount;
-     target_count=allTargetCount;
-}
+
     void LD2450::process_message(uint8_t *msg, int len)
     {
         sensor_available_ = true;
@@ -321,7 +315,8 @@ void delayed_update(int target_count)
             target_count += target->is_present();
         }
         is_occupied_ = target_count > 0;
-        std::thread(delay_thread, delayed_update, std::ref(allTargetCount), target_count).detach();
+        allTargetCount=target_count+allTargetCount;
+        target_count=allTargetCount;
 
 #ifdef USE_BINARY_SENSOR
         if (occupancy_binary_sensor_ != nullptr && occupancy_binary_sensor_->state != is_occupied_)
