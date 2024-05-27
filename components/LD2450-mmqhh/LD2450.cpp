@@ -276,7 +276,12 @@ namespace esphome::ld2450
             }
         }
     }
-
+void delayed_update(int target_count) 
+{
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+     allTargetCount=target_count+allTargetCount;
+     target_count=allTargetCount;
+}
     void LD2450::process_message(uint8_t *msg, int len)
     {
         sensor_available_ = true;
@@ -316,9 +321,7 @@ namespace esphome::ld2450
             target_count += target->is_present();
         }
         is_occupied_ = target_count > 0;
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-         allTargetCount=target_count+allTargetCount;
-        target_count=allTargetCount;
+        std::thread(delay_thread, delayed_update, std::ref(allTargetCount), target_count).detach();
 
 #ifdef USE_BINARY_SENSOR
         if (occupancy_binary_sensor_ != nullptr && occupancy_binary_sensor_->state != is_occupied_)
